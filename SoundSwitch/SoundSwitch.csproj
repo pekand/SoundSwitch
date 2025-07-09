@@ -18,4 +18,12 @@
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="pwsh.exe $(SolutionDir)tools\postbuild.ps1 $(ConfigurationName) $(SolutionDir) $(OutDir) $(TargetPath)" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="pwsh.exe $(SolutionDir)tools\prebuild.ps1 $(ConfigurationName) $(SolutionDir) $(OutDir) $(TargetPath)" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+
 </Project>
