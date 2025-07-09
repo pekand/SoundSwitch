@@ -1,4 +1,6 @@
+using Microsoft.Win32;
 using NAudio.CoreAudioApi;
+using System.Diagnostics;
 using System.Xml.Linq;
 
 namespace SoundSwitch
@@ -172,6 +174,7 @@ namespace SoundSwitch
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             mostTopToolStripMenuItem.Checked = this.TopMost;
+            autorunToolStripMenuItem.Checked = this.IsInAutorun();
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -197,6 +200,51 @@ namespace SoundSwitch
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private const string AutorunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private static string AppName => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
+
+        public bool IsInAutorun()
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AutorunKeyPath, false))
+            {
+                return key?.GetValue(AppName) != null;
+            }
+        }
+
+        public void AddToAutorun()
+        {
+            string exePath = Process.GetCurrentProcess().MainModule.FileName;
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AutorunKeyPath, true))
+            {
+                key.SetValue(AppName, $"\"{exePath}\"");
+            }
+        }
+
+        public void RemoveFromAutorun()
+        {
+            using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AutorunKeyPath, true))
+            {
+                key.DeleteValue(AppName, false);
+            }
+        }
+
+        public string GetCurrentExecutablePath()
+        {
+            return Process.GetCurrentProcess().MainModule.FileName;
+        }
+
+        private void autorunToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!this.IsInAutorun())
+            {
+                this.AddToAutorun();
+            }
+            else
+            {
+                this.RemoveFromAutorun();
+            }
         }
     }
 }

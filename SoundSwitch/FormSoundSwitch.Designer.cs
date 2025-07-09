@@ -31,17 +31,18 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormSoundSwitch));
             comboBox1 = new ComboBox();
-            contextMenuStrip1 = new ContextMenuStrip(components);
+            contextMenuStrip = new ContextMenuStrip(components);
             optionsToolStripMenuItem = new ToolStripMenuItem();
             mostTopToolStripMenuItem = new ToolStripMenuItem();
             closeToolStripMenuItem = new ToolStripMenuItem();
             instantProgressBar1 = new InstantProgressBar();
-            contextMenuStrip1.SuspendLayout();
+            autorunToolStripMenuItem = new ToolStripMenuItem();
+            contextMenuStrip.SuspendLayout();
             SuspendLayout();
             // 
             // comboBox1
             // 
-            comboBox1.ContextMenuStrip = contextMenuStrip1;
+            comboBox1.ContextMenuStrip = contextMenuStrip;
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             comboBox1.FormattingEnabled = true;
@@ -50,38 +51,38 @@
             comboBox1.Size = new Size(282, 29);
             comboBox1.TabIndex = 0;
             // 
-            // contextMenuStrip1
+            // contextMenuStrip
             // 
-            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { optionsToolStripMenuItem, closeToolStripMenuItem });
-            contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(128, 52);
-            contextMenuStrip1.Opening += contextMenuStrip1_Opening;
+            contextMenuStrip.Items.AddRange(new ToolStripItem[] { optionsToolStripMenuItem, closeToolStripMenuItem });
+            contextMenuStrip.Name = "contextMenuStrip1";
+            contextMenuStrip.Size = new Size(181, 74);
+            contextMenuStrip.Opening += contextMenuStrip1_Opening;
             // 
             // optionsToolStripMenuItem
             // 
-            optionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mostTopToolStripMenuItem });
+            optionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mostTopToolStripMenuItem, autorunToolStripMenuItem });
             optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            optionsToolStripMenuItem.Size = new Size(127, 24);
+            optionsToolStripMenuItem.Size = new Size(180, 24);
             optionsToolStripMenuItem.Text = "Options";
             optionsToolStripMenuItem.Click += optionsToolStripMenuItem_Click;
             // 
             // mostTopToolStripMenuItem
             // 
             mostTopToolStripMenuItem.Name = "mostTopToolStripMenuItem";
-            mostTopToolStripMenuItem.Size = new Size(135, 24);
+            mostTopToolStripMenuItem.Size = new Size(180, 24);
             mostTopToolStripMenuItem.Text = "Most top";
             mostTopToolStripMenuItem.Click += mostTopToolStripMenuItem_Click;
             // 
             // closeToolStripMenuItem
             // 
             closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            closeToolStripMenuItem.Size = new Size(127, 24);
+            closeToolStripMenuItem.Size = new Size(180, 24);
             closeToolStripMenuItem.Text = "Close";
             closeToolStripMenuItem.Click += closeToolStripMenuItem_Click;
             // 
             // instantProgressBar1
             // 
-            instantProgressBar1.ContextMenuStrip = contextMenuStrip1;
+            instantProgressBar1.ContextMenuStrip = contextMenuStrip;
             instantProgressBar1.Location = new Point(12, 47);
             instantProgressBar1.Minimum = 0;
             instantProgressBar1.Name = "instantProgressBar1";
@@ -93,12 +94,19 @@
             instantProgressBar1.MouseMove += instantProgressBar1_MouseMove;
             instantProgressBar1.MouseUp += instantProgressBar1_MouseUp;
             // 
+            // autorunToolStripMenuItem
+            // 
+            autorunToolStripMenuItem.Name = "autorunToolStripMenuItem";
+            autorunToolStripMenuItem.Size = new Size(180, 24);
+            autorunToolStripMenuItem.Text = "Autorun";
+            autorunToolStripMenuItem.Click += autorunToolStripMenuItem_Click;
+            // 
             // FormSoundSwitch
             // 
             AutoScaleDimensions = new SizeF(8F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(305, 83);
-            ContextMenuStrip = contextMenuStrip1;
+            ContextMenuStrip = contextMenuStrip;
             Controls.Add(instantProgressBar1);
             Controls.Add(comboBox1);
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -109,7 +117,7 @@
             Activated += FormSoundSwitch_Activated;
             FormClosing += FormSoundSwitch_FormClosing;
             Load += FormSoundSwitch_Load;
-            contextMenuStrip1.ResumeLayout(false);
+            contextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -117,9 +125,10 @@
 
         private ComboBox comboBox1;
         private InstantProgressBar instantProgressBar1;
-        private ContextMenuStrip contextMenuStrip1;
+        private ContextMenuStrip contextMenuStrip;
         private ToolStripMenuItem closeToolStripMenuItem;
         private ToolStripMenuItem optionsToolStripMenuItem;
         private ToolStripMenuItem mostTopToolStripMenuItem;
+        private ToolStripMenuItem autorunToolStripMenuItem;
     }
 }
