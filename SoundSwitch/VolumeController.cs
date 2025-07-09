@@ -9,10 +9,15 @@ namespace SoundSwitch
 {
     public class VolumeController
     {
-        private readonly MMDeviceEnumerator deviceEnumerator;
-        private readonly MMDevice defaultDevice;
+        private MMDeviceEnumerator deviceEnumerator = null;
+        private MMDevice defaultDevice = null;
 
         public VolumeController()
+        {
+            SetCurrentDevice();
+        }
+      
+        public void SetCurrentDevice()
         {
             deviceEnumerator = new MMDeviceEnumerator();
             defaultDevice = deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
@@ -26,7 +31,7 @@ namespace SoundSwitch
 
         // Set volume 0-100
         public void SetVolume(int volumePercent)
-        {
+        {        
             if (volumePercent < 0) volumePercent = 0;
             if (volumePercent > 100) volumePercent = 100;
 

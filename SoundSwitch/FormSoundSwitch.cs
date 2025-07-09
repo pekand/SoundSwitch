@@ -39,6 +39,7 @@ namespace SoundSwitch
         {
             InitializeComponent();
             LoadAudioDevices();
+            vc.SetCurrentDevice();
 
             instantProgressBar1.Value = vc.GetVolume();
 
@@ -221,6 +222,7 @@ namespace SoundSwitch
             if (comboBox1.SelectedItem is AudioDeviceItem selected)
             {
                 AudioDeviceSwitcher.SetDefaultDevice(selected.Id);
+                vc.SetCurrentDevice();
             }
         }
 
