@@ -52,13 +52,22 @@ namespace SoundSwitch
             if (data.ContainsKey("Left"))
             {
                 this.Left = Int32.Parse(data["Left"]);
+
+                if (this.Left<0) {
+                    this.Left = 0;
+                }
             }
 
             if (data.ContainsKey("Top"))
             {
                 this.Top = Int32.Parse(data["Top"]);
+                if (this.Top < 0)
+                {
+                    this.Top = 0;
+                }
             }
 
+            this.MaximizeBox = false;
 
             // HIDE TITLE BAR
             clientWidth = this.ClientSize.Width;
@@ -69,7 +78,17 @@ namespace SoundSwitch
             topPos = this.Top;
         }
 
+        // PREVENT MAXIMALIZE
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_SYSCOMMAND = 0x0112;
+            const int SC_MAXIMIZE = 0xF030;
 
+            if (m.Msg == WM_SYSCOMMAND && (m.WParam.ToInt32() == SC_MAXIMIZE))
+                return; // ignore maximize command
+
+            base.WndProc(ref m);
+        }
 
         // EVENT ACTIVATE FORM
         private void FormSoundSwitch_Activated(object sender, EventArgs e)
@@ -77,14 +96,18 @@ namespace SoundSwitch
             LoadAudioDevices();
             instantProgressBar1.Value = vc.GetVolume();
 
-            if (this.FormBorderStyle == FormBorderStyle.None) {
-                this.Left = leftPos;
-                this.Top = topPos;
-                this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                clientWidth = this.ClientSize.Width;
-                clientHeight = this.ClientSize.Height;
-                totalWidth = this.Width;
-                totalHeight = this.Height;
+            if (this.WindowState != FormWindowState.Minimized)
+            {
+                if (this.FormBorderStyle == FormBorderStyle.None)
+                {
+                    this.Left = leftPos;
+                    this.Top = topPos;
+                    this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                    clientWidth = this.ClientSize.Width;
+                    clientHeight = this.ClientSize.Height;
+                    totalWidth = this.Width;
+                    totalHeight = this.Height;
+                }
             }
         }
 
@@ -92,22 +115,31 @@ namespace SoundSwitch
         // EVENT DEACTIVATE FORM
         private void FormSoundSwitch_Deactivate(object sender, EventArgs e)
         {
-            if (this.FormBorderStyle == FormBorderStyle.FixedSingle)
+            if (this.WindowState != FormWindowState.Minimized)
             {
-                leftPos = this.Left;
-                topPos = this.Top;
-                this.FormBorderStyle = FormBorderStyle.None;
-                this.Left += (totalWidth - clientWidth) / 2;
-                int borderWidth = (totalWidth - clientWidth) / 2;
-                this.Top += (totalHeight - clientHeight) - borderWidth;
+                if (this.FormBorderStyle == FormBorderStyle.FixedSingle)
+                {
+                    leftPos = this.Left;
+                    topPos = this.Top;
+                    this.FormBorderStyle = FormBorderStyle.None;
+                    this.Left += (totalWidth - clientWidth) / 2;
+                    int borderWidth = (totalWidth - clientWidth) / 2;
+                    this.Top += (totalHeight - clientHeight) - borderWidth;
+                }
             }
         }
 
         // EVENT FORM CLOSING
         private void FormSoundSwitch_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+
             data["Left"] = this.Left.ToString();
             data["Top"] = this.Top.ToString();
+
             data["TopMost"] = this.TopMost ? "1" : "0";
 
             SaveData();
