@@ -12,10 +12,29 @@ namespace SoundSwitch
 
         private bool isDragging = false;
 
-        VolumeController vc = new VolumeController();
+        private VolumeController vc = new VolumeController();
 
-        Dictionary<string, string> data = new Dictionary<string, string>();
+        private Dictionary<string, string> data = new Dictionary<string, string>();
 
+        private const string AutorunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private static string AppName => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
+
+
+        int clientWidth = 0;
+        int clientHeight = 0;
+        int totalWidth = 0;
+        int totalHeight = 0;
+        int leftPos = 0;
+        int topPos = 0;
+
+        class AudioDeviceItem
+        {
+            public string Name { get; set; }
+            public string Id { get; set; }
+            public override string ToString() => Name;
+        }
+
+        // INIT
         public FormSoundSwitch()
         {
             InitializeComponent();
@@ -39,8 +58,63 @@ namespace SoundSwitch
             {
                 this.Top = Int32.Parse(data["Top"]);
             }
+
+
+            // HIDE TITLE BAR
+            clientWidth = this.ClientSize.Width;
+            clientHeight = this.ClientSize.Height;
+            totalWidth = this.Width;
+            totalHeight = this.Height;
+            leftPos = this.Left;
+            topPos = this.Top;
         }
 
+
+
+        // EVENT ACTIVATE FORM
+        private void FormSoundSwitch_Activated(object sender, EventArgs e)
+        {
+            LoadAudioDevices();
+            instantProgressBar1.Value = vc.GetVolume();
+
+            if (this.FormBorderStyle == FormBorderStyle.None) {
+                this.Left = leftPos;
+                this.Top = topPos;
+                this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                clientWidth = this.ClientSize.Width;
+                clientHeight = this.ClientSize.Height;
+                totalWidth = this.Width;
+                totalHeight = this.Height;
+            }
+        }
+
+
+        // EVENT DEACTIVATE FORM
+        private void FormSoundSwitch_Deactivate(object sender, EventArgs e)
+        {
+            if (this.FormBorderStyle == FormBorderStyle.FixedSingle)
+            {
+                leftPos = this.Left;
+                topPos = this.Top;
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.Left += (totalWidth - clientWidth) / 2;
+                int borderWidth = (totalWidth - clientWidth) / 2;
+                this.Top += (totalHeight - clientHeight) - borderWidth;
+            }
+        }
+
+        // EVENT FORM CLOSING
+        private void FormSoundSwitch_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            data["Left"] = this.Left.ToString();
+            data["Top"] = this.Top.ToString();
+            data["TopMost"] = this.TopMost ? "1" : "0";
+
+            SaveData();
+        }
+
+
+        // OPTIONS LOAD XML
         void LoadData()
         {
             string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SoundSwitch", "options.xml");
@@ -65,6 +139,7 @@ namespace SoundSwitch
             return;
         }
 
+        // OPTIONS SAVE XML 
         void SaveData()
         {
             string folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SoundSwitch");
@@ -84,6 +159,7 @@ namespace SoundSwitch
             root.Save(path);
         }
 
+        // AUDIO DEVICES LIST
         private void LoadAudioDevices()
         {
             devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
@@ -107,6 +183,7 @@ namespace SoundSwitch
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
         }
 
+        // COMBOBX AUDIO DEVICES LIST
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (comboBox1.SelectedItem is AudioDeviceItem selected)
@@ -115,18 +192,13 @@ namespace SoundSwitch
             }
         }
 
-        class AudioDeviceItem
-        {
-            public string Name { get; set; }
-            public string Id { get; set; }
-            public override string ToString() => Name;
-        }
-
+        //EVENT LOAD FORM
         private void FormSoundSwitch_Load(object sender, EventArgs e)
         {
 
         }
 
+        // VOLUME PROGRESSBAR UPDATE
         private void UpdateProgressBarValue(int mouseX)
         {
             int width = instantProgressBar1.Width;
@@ -140,18 +212,14 @@ namespace SoundSwitch
             vc.SetVolume(value);
         }
 
-        private void SetVolume(int volumePercent)
-        {
-            // TODO: Your volume setting logic here
-            // Example: call your AudioSwitcher or CoreAudio library with volumePercent
-        }
-
+        // VOLUME PROGRESSBAR UPDATE
         private void instantProgressBar1_MouseDown(object sender, MouseEventArgs e)
         {
             isDragging = true;
             UpdateProgressBarValue(e.X);
         }
 
+        // VOLUME PROGRESSBAR UPDATE
         private void instantProgressBar1_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDragging)
@@ -160,51 +228,33 @@ namespace SoundSwitch
             }
         }
 
+        // VOLUME PROGRESSBAR UPDATE
         private void instantProgressBar1_MouseUp(object sender, MouseEventArgs e)
         {
             isDragging = false;
         }
 
-        private void FormSoundSwitch_Activated(object sender, EventArgs e)
-        {
-            LoadAudioDevices();
-            instantProgressBar1.Value = vc.GetVolume();
-        }
-
+        // CONTEXTMENU OPEN
         private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
             mostTopToolStripMenuItem.Checked = this.TopMost;
             autorunToolStripMenuItem.Checked = this.IsInAutorun();
         }
 
+        // CONTEXTMENU Close
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+        // CONTEXTMENU Most Top
         private void mostTopToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.TopMost = !this.TopMost;
             mostTopToolStripMenuItem.Checked = this.TopMost;
         }
-
-        private void FormSoundSwitch_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            data["Left"] = this.Left.ToString();
-            data["Top"] = this.Top.ToString();
-            data["TopMost"] = this.TopMost ? "1" : "0";
-
-            SaveData();
-        }
-
-        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private const string AutorunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-        private static string AppName => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
-
+        
+        // AUTORUN
         public bool IsInAutorun()
         {
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AutorunKeyPath, false))
@@ -213,6 +263,7 @@ namespace SoundSwitch
             }
         }
 
+        // AUTORUN
         public void AddToAutorun()
         {
             string exePath = Process.GetCurrentProcess().MainModule.FileName;
@@ -222,6 +273,7 @@ namespace SoundSwitch
             }
         }
 
+        // AUTORUN
         public void RemoveFromAutorun()
         {
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(AutorunKeyPath, true))
@@ -230,11 +282,14 @@ namespace SoundSwitch
             }
         }
 
+        // AUTORUN
         public string GetCurrentExecutablePath()
         {
             return Process.GetCurrentProcess().MainModule.FileName;
         }
 
+
+        // CONTEXTMENU AUTORUN OPTION
         private void autorunToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (!this.IsInAutorun())
@@ -246,5 +301,7 @@ namespace SoundSwitch
                 this.RemoveFromAutorun();
             }
         }
+
+
     }
 }
