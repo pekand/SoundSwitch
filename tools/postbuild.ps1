@@ -51,14 +51,14 @@ Write-Host "TARGET2=>$TARGET2<"
 ### & $snPath -R "$TARGET2" $CERT_STRONG_NAME
 ### & $snPath -v "$TARGET2"
 
-if (Test-Path $CERT_CODE) {
-
-$signtoolPath = 'signtool.exe'
-& $signtoolPath sign /fd SHA256 /f "$CERT_CODE" /p $CERT_PWD /tr http://timestamp.digicert.com /td sha256 /v "$TARGET1"
-& $signtoolPath sign /fd SHA256 /f "$CERT_CODE" /p $CERT_PWD /tr http://timestamp.digicert.com /td sha256 /v "$TARGET2"
-& $signtoolPath verify /pa /v "$TARGET1"
-& $signtoolPath verify /pa /v "$TARGET2"
-
-}
+### if (Test-Path $CERT_CODE) {
+### 
+### $signtoolPath = 'signtool.exe'
+### & $signtoolPath sign /fd SHA256 /f "$CERT_CODE" /p $CERT_PWD /tr http://timestamp.digicert.com /td sha256 /v "$TARGET1"
+### & $signtoolPath sign /fd SHA256 /f "$CERT_CODE" /p $CERT_PWD /tr http://timestamp.digicert.com /td sha256 /v "$TARGET2"
+### & $signtoolPath verify /pa /v "$TARGET1"
+### & $signtoolPath verify /pa /v "$TARGET2"
+### 
+### }
 
 }

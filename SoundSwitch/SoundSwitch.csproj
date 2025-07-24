@@ -8,6 +8,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x64</Platforms>
     <ApplicationIcon>SoundSwitch.ico</ApplicationIcon>
+
+    <Product>SoundSwitchWidget</Product>
+    <AssemblyVersion>$([System.IO.File]::ReadAllText('..\version.txt').Trim())</AssemblyVersion>
+    <BuildDate>$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd HH:mm:ss"))</BuildDate>    
+    <VersionPrefix>$(AssemblyVersion)</VersionPrefix>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <InformationalVersion>$(AssemblyVersion)</InformationalVersion>
+    <Copyright>© 2025 Built on $(BuildDate)</Copyright>
+    <ContinuousIntegrationBuild>false</ContinuousIntegrationBuild>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,7 @@ namespace SoundSwitch
     {
         private MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
         private MMDeviceCollection devices;
+        private MMDevice selectedDevice;
 
         private bool isDragging = false;
 
@@ -89,6 +90,8 @@ namespace SoundSwitch
             totalHeight = this.Height;
             leftPos = this.Left;
             topPos = this.Top;
+
+            comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
         }
 
         // PREVENT MAXIMALIZE
@@ -101,6 +104,12 @@ namespace SoundSwitch
                 return; // ignore maximize command
 
             base.WndProc(ref m);
+        }
+
+        //EVENT LOAD FORM
+        private void FormSoundSwitch_Load(object sender, EventArgs e)
+        {
+
         }
 
         // EVENT ACTIVATE FORM
@@ -148,8 +157,6 @@ namespace SoundSwitch
                         currentScreen.WorkingArea.Top + (currentScreen.WorkingArea.Height - this.Height) / 2
                     );
                 }
-
-
             }
         }
 
@@ -188,7 +195,6 @@ namespace SoundSwitch
 
             SaveData();
         }
-
 
         // OPTIONS LOAD XML
         void LoadData()
@@ -238,25 +244,43 @@ namespace SoundSwitch
         // AUDIO DEVICES LIST
         private void LoadAudioDevices()
         {
-            devices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            var defaultDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            bool somethingChange = false;
+            MMDeviceCollection currentDevices = enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            MMDevice currentDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-            comboBox1.Items.Clear();
-
-            for (int i = 0; i < devices.Count; i++)
-            {
-                var device = devices[i];
-                comboBox1.Items.Add(new AudioDeviceItem
+            if (devices== null || currentDevices.Count() != devices.Count() || selectedDevice == null || selectedDevice.ID != currentDevice.ID) {
+                somethingChange = true;
+            }
+            else {
+                for (int i = 0; i < devices.Count; i++)
                 {
-                    Name = device.FriendlyName,
-                    Id = device.ID
-                });
-
-                if (device.ID == defaultDevice.ID)
-                    comboBox1.SelectedIndex = i;
+                    if (devices[i].FriendlyName != currentDevices[i].FriendlyName ||
+                        devices[i].ID != currentDevices[i].ID
+                    ) {
+                        somethingChange = true;
+                        break;
+                    }
+                }
             }
 
-            comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
+            if (somethingChange) {
+                devices = currentDevices;
+                selectedDevice = currentDevice;
+                comboBox1.Items.Clear();
+                
+                for (int i = 0; i < devices.Count; i++)
+                {
+                    var device = devices[i];
+                    comboBox1.Items.Add(new AudioDeviceItem
+                    {
+                        Name = device.FriendlyName,
+                        Id = device.ID
+                    });
+
+                    if (device.ID == currentDevice.ID)
+                        comboBox1.SelectedIndex = i;
+                }
+            }
         }
 
         // COMBOBX AUDIO DEVICES LIST
@@ -266,13 +290,8 @@ namespace SoundSwitch
             {
                 AudioDeviceSwitcher.SetDefaultDevice(selected.Id);
                 vc.SetCurrentDevice();
+                selectedDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
             }
-        }
-
-        //EVENT LOAD FORM
-        private void FormSoundSwitch_Load(object sender, EventArgs e)
-        {
-
         }
 
         // VOLUME PROGRESSBAR UPDATE
@@ -310,8 +329,6 @@ namespace SoundSwitch
         {
             isDragging = false;
         }
-
-        
 
         // AUTORUN
         public bool IsInAutorun()
