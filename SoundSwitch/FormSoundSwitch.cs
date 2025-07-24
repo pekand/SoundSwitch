@@ -19,6 +19,7 @@ namespace SoundSwitch
         private const string AutorunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
         private static string AppName => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.FileName);
 
+        public float defaultOpacity = 0.7F;
 
         int clientWidth = 0;
         int clientHeight = 0;
@@ -50,11 +51,22 @@ namespace SoundSwitch
                 this.TopMost = data["TopMost"] == "1";
             }
 
+            if (data.ContainsKey("ShowInTaskbar"))
+            {
+                this.ShowInTaskbar = data["ShowInTaskbar"] == "1";
+            }
+
+            if (data.ContainsKey("Opacity"))
+            {
+                this.Opacity = float.Parse(data["Opacity"]);
+            }
+
             if (data.ContainsKey("Left"))
             {
                 this.Left = Int32.Parse(data["Left"]);
 
-                if (this.Left<0) {
+                if (this.Left < 0)
+                {
                     this.Left = 0;
                 }
             }
@@ -104,14 +116,42 @@ namespace SoundSwitch
                     this.Left = leftPos;
                     this.Top = topPos;
                     this.FormBorderStyle = FormBorderStyle.FixedSingle;
-                    clientWidth = this.ClientSize.Width;
-                    clientHeight = this.ClientSize.Height;
-                    totalWidth = this.Width;
-                    totalHeight = this.Height;
+                    if (clientWidth == 0)
+                    {
+                        clientWidth = this.ClientSize.Width;
+                        clientHeight = this.ClientSize.Height;
+                        totalWidth = this.Width;
+                        totalHeight = this.Height;
+                    }
                 }
+
+                if (this.Width < 321)
+                {
+                    this.Width = 321;
+                }
+
+                if (this.Height < 122)
+                {
+                    this.Height = 122;
+                }
+
+                Rectangle formBounds = this.Bounds;
+                bool isVisibleOnAnyScreen = Screen.AllScreens
+                    .Any(screen => screen.WorkingArea.IntersectsWith(formBounds));
+
+                if (!isVisibleOnAnyScreen)
+                {
+                    Screen currentScreen = Screen.FromPoint(Cursor.Position);
+                    this.StartPosition = FormStartPosition.Manual;
+                    this.Location = new Point(
+                        currentScreen.WorkingArea.Left + (currentScreen.WorkingArea.Width - this.Width) / 2,
+                        currentScreen.WorkingArea.Top + (currentScreen.WorkingArea.Height - this.Height) / 2
+                    );
+                }
+
+
             }
         }
-
 
         // EVENT DEACTIVATE FORM
         private void FormSoundSwitch_Deactivate(object sender, EventArgs e)
@@ -140,8 +180,11 @@ namespace SoundSwitch
 
             data["Left"] = this.Left.ToString();
             data["Top"] = this.Top.ToString();
+            
 
             data["TopMost"] = this.TopMost ? "1" : "0";
+            data["ShowInTaskbar"] = this.ShowInTaskbar ? "1" : "0";
+            data["Opacity"] = this.Opacity.ToString();
 
             SaveData();
         }
@@ -268,26 +311,8 @@ namespace SoundSwitch
             isDragging = false;
         }
 
-        // CONTEXTMENU OPEN
-        private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            mostTopToolStripMenuItem.Checked = this.TopMost;
-            autorunToolStripMenuItem.Checked = this.IsInAutorun();
-        }
-
-        // CONTEXTMENU Close
-        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        // CONTEXTMENU Most Top
-        private void mostTopToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.TopMost = !this.TopMost;
-            mostTopToolStripMenuItem.Checked = this.TopMost;
-        }
         
+
         // AUTORUN
         public bool IsInAutorun()
         {
@@ -322,6 +347,27 @@ namespace SoundSwitch
             return Process.GetCurrentProcess().MainModule.FileName;
         }
 
+        // CONTEXTMENU OPEN
+        private void contextMenuStrip1_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            mostTopToolStripMenuItem.Checked = this.TopMost;
+            autorunToolStripMenuItem.Checked = this.IsInAutorun();
+            showInTaskbarToolStripMenuItem.Checked = this.ShowInTaskbar;
+            oppacityToolStripMenuItem.Checked = (this.Opacity == defaultOpacity);
+        }
+
+        // CONTEXTMENU Close
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        // CONTEXTMENU Most Top
+        private void mostTopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.TopMost = !this.TopMost;
+            mostTopToolStripMenuItem.Checked = this.TopMost;
+        }
 
         // CONTEXTMENU AUTORUN OPTION
         private void autorunToolStripMenuItem_Click(object sender, EventArgs e)
@@ -336,6 +382,20 @@ namespace SoundSwitch
             }
         }
 
+        // CONTEXTMENU SHOW IN TASKBAR OPTION
+        private void showInTaskbarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = !this.ShowInTaskbar;
+            showInTaskbarToolStripMenuItem.Checked = this.ShowInTaskbar;
+            
+        }
 
+        // CONTEXTMENU OPACITY OPTION
+        private void oppacityToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Opacity = (this.Opacity == 1) ? defaultOpacity : 1;
+            oppacityToolStripMenuItem.Checked = (this.Opacity == defaultOpacity);
+
+        }
     }
 }

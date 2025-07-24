@@ -35,6 +35,8 @@
             optionsToolStripMenuItem = new ToolStripMenuItem();
             mostTopToolStripMenuItem = new ToolStripMenuItem();
             autorunToolStripMenuItem = new ToolStripMenuItem();
+            showInTaskbarToolStripMenuItem = new ToolStripMenuItem();
+            oppacityToolStripMenuItem = new ToolStripMenuItem();
             closeToolStripMenuItem = new ToolStripMenuItem();
             instantProgressBar1 = new InstantProgressBar();
             contextMenuStrip.SuspendLayout();
@@ -60,7 +62,7 @@
             // 
             // optionsToolStripMenuItem
             // 
-            optionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mostTopToolStripMenuItem, autorunToolStripMenuItem });
+            optionsToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mostTopToolStripMenuItem, autorunToolStripMenuItem, showInTaskbarToolStripMenuItem, oppacityToolStripMenuItem });
             optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
             optionsToolStripMenuItem.Size = new Size(127, 24);
             optionsToolStripMenuItem.Text = "Options";
@@ -78,6 +80,20 @@
             autorunToolStripMenuItem.Size = new Size(180, 24);
             autorunToolStripMenuItem.Text = "Autorun";
             autorunToolStripMenuItem.Click += autorunToolStripMenuItem_Click;
+            // 
+            // showInTaskbarToolStripMenuItem
+            // 
+            showInTaskbarToolStripMenuItem.Name = "showInTaskbarToolStripMenuItem";
+            showInTaskbarToolStripMenuItem.Size = new Size(180, 24);
+            showInTaskbarToolStripMenuItem.Text = "Show in taskbar";
+            showInTaskbarToolStripMenuItem.Click += showInTaskbarToolStripMenuItem_Click;
+            // 
+            // oppacityToolStripMenuItem
+            // 
+            oppacityToolStripMenuItem.Name = "oppacityToolStripMenuItem";
+            oppacityToolStripMenuItem.Size = new Size(180, 24);
+            oppacityToolStripMenuItem.Text = "Oppacity";
+            oppacityToolStripMenuItem.Click += oppacityToolStripMenuItem_Click;
             // 
             // closeToolStripMenuItem
             // 
@@ -111,6 +127,7 @@
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FormSoundSwitch";
+            ShowInTaskbar = false;
             StartPosition = FormStartPosition.Manual;
             Text = "SoundSwitch";
             Activated += FormSoundSwitch_Activated;
@@ -130,5 +147,7 @@
         private ToolStripMenuItem optionsToolStripMenuItem;
         private ToolStripMenuItem mostTopToolStripMenuItem;
         private ToolStripMenuItem autorunToolStripMenuItem;
+        private ToolStripMenuItem showInTaskbarToolStripMenuItem;
+        private ToolStripMenuItem oppacityToolStripMenuItem;
     }
 }
